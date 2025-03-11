@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ysc.blogalone.mapper.BlogMapper">
+    <resultMap id="blogMap" type="com.ysc.blogalone.entity.article.Blog">
+        <result column="BLOG_ID" jdbcType="BIGINT" property="blogId" />
+        <result column="USER_ID" jdbcType="BIGINT" property="userId" />
+        <result column="BLOG_SORT" jdbcType="VARCHAR" property="blogSort" />
+        <result column="CLASSIFICATION_ID" jdbcType="INTEGER" property="classificationId" />
+        <result column="TAG_ID" jdbcType="BIGINT" property="tagId" />
+        <result column="TITLE" jdbcType="VARCHAR" property="title" />
+        <result column="CONTENT" jdbcType="VARCHAR" property="content" />
+        <result column="BLOG_STATUS" jdbcType="INTEGER" property="blogStatus" />
+        <result column="BLOG_PRIVATE" jdbcType="INTEGER" property="blogPrivate" />
+        <result column="PREVIEW_THEME" jdbcType="VARCHAR" property="previewTheme" />
+        <result column="CODE_THEME" jdbcType="VARCHAR" property="codeTheme" />
+        <result column="THEME" jdbcType="VARCHAR" property="theme" />
+        <result column="COVER_SRC" jdbcType="VARCHAR" property="coverSrc" />
+        <result column="HAS_COVER" jdbcType="INTEGER" property="hasCover" />
+        <result column="BROWSE_NUMBER" jdbcType="INTEGER" property="browseNumber" />
+        <result column="LIKE_NUMBER" jdbcType="INTEGER" property="likeNumber" />
+        <result column="COLLECT_NUMBER" jdbcType="INTEGER" property="collectNumber" />
+        <result column="IS_DELETE" jdbcType="INTEGER" property="isDelete" />
+        <result column="CREATE_TIME" jdbcType="DATE" property="createTime" />
+        <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+        <association property="user" javaType="com.ysc.blogalone.entity.user.User">
+            <result column="USER_ID" jdbcType="BIGINT" property="userId" />
+            <result column="USERNAME" jdbcType="VARCHAR" property="username" />
+            <result column="NICKNAME" jdbcType="VARCHAR" property="nickname" />
+            <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+            <result column="GENDER" jdbcType="VARCHAR" property="gender" />
+            <result column="FAN_NUMBER" jdbcType="INTEGER" property="fanNumber" />
+            <result column="FOLLOW_NUMBER" jdbcType="INTEGER" property="followNumber" />
+            <result column="COLLECT_NUMBER" jdbcType="INTEGER" property="collectNumber" />
+            <result column="AVATAR" jdbcType="VARCHAR" property="avatar" />
+            <result column="BAN" jdbcType="INTEGER" property="ban" />
+            <result column="ENABLED" jdbcType="INTEGER" property="enabled" />
+            <result column="ACCOUNT_NO_EXPIRED" jdbcType="INTEGER" property="accountNoExpired" />
+            <result column="CREDENTIALS_NO_EXPIRED" jdbcType="INTEGER" property="credentialsNoExpired" />
+            <result column="ACCOUNT_NO_LOCKED" jdbcType="INTEGER" property="accountNoLocked" />
+            <result column="CREATE_TIME" jdbcType="DATE" property="createTime" />
+            <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+        </association>
+        <association property="articleTag" javaType="com.ysc.blogalone.entity.article.ArticleTag">
+            <result column="TAG_ID" jdbcType="INTEGER" property="tagId" />
+            <result column="USER_ID" jdbcType="BIGINT" property="userId" />
+            <result column="TAG_NAME" jdbcType="VARCHAR" property="tagName" />
+            <result column="TAG_ARTICLE_NUM" jdbcType="INTEGER" property="tagArticleNum" />
+            <result column="TAG_SORT" jdbcType="INTEGER" property="tagSort" />
+            <result column="IS_DELETE" jdbcType="INTEGER" property="isDelete" />
+            <result column="CREATE_TIME" jdbcType="DATE" property="createTime" />
+            <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+        </association>
+        <association property="classification" javaType="com.ysc.blogalone.entity.article.Classification">
+            <result column="CLASSIFICATION_ID" jdbcType="INTEGER" property="classificationId" />
+            <result column="USER_ID" jdbcType="BIGINT" property="userId" />
+            <result column="CLASSIFICATION_TITLE" jdbcType="VARCHAR" property="classificationTitle" />
+            <result column="BLOG_NUMBER" jdbcType="INTEGER" property="blogNumber" />
+            <result column="IS_DELETE" jdbcType="INTEGER" property="isDelete" />
+            <result column="CREATE_TIME" jdbcType="DATE" property="createTime" />
+            <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+        </association>
+    </resultMap>
+    <select id="getList" resultMap="blogMap">
+        select * from blog b
+        left join user u on b.user_id = u.user_id
+        left join article_tag a on b.tag_id = a.tag_id
+        left join classification c on c.classification_id = b.classification_id
+        <where>
+            and b.is_delete = 0
+             <if test="blog.title != null and blog.title.length > 0">
+                and b.title like concat('%', #{blog.title}, '%')
+            </if>
+            <if test="blog.blogSort != null and blog.blogSort.length > 0">
+                and b.blog_sort like concat('%', #{blog.blogSort}, '%')
+            </if>
+            <if test="blog.updateTime != null and blog.updateTime.length > 0">
+                and b.update_time > #{blog.updateTime}
+            </if>
+            <if test="blog.tagName != null and blog.tagName.length > 0">
+                and a.tag_name like concat('%', #{blog.tagName}, '%')
+            </if>
+            <if test="blog.tagId != null">
+                and b.tag_id = #{blog.tagId}
+            </if>
+            <if test="blog.userId != null">
+                and b.user_id = #{blog.userId}
+            </if>
+            <if test="blog.blogStatus != null">
+                and b.blog_status = #{blog.blogStatus}
+            </if>
+            <if test="blog.blogPrivate != null">
+                and b.blog_private = #{blog.blogPrivate}
+            </if>
+            <if test="blog.classificationId != null">
+                and b.classification_id = #{blog.classificationId}
+            </if>
+            <if test="blog.sortStr != null and blog.sortStr.length > 0">
+                order by b.update_time desc
+            </if>
+            <if test="blog.sortStr == null or blog.sortStr.length == 0">
+                order by b.update_time asc
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
